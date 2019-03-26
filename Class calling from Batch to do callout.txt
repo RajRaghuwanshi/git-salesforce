@@ -1,0 +1,104 @@
+/**********************************************************************************
+**Name: DealReg_EDMSWebServiceCallout
+**Description: To make web service callout from DRStubForEclipseEDMS
+***********************************************************************************/
+public class DealReg_EDMSWebServiceCallout{
+    public static string callWebServiceCreateDealVersion(String OpporunityXml,String Approveremail,String Version,Id OpportunityId,String Status){
+        DateTime d = System.now();
+        String createdStr = d.formatGmt('yyyy-MM-dd HH:mm:ss.SSSSSS');
+        String nonceStr = String.valueOf(Crypto.getRandomInteger());                            
+        Blob nonceBlob = Blob.valueOf(nonceStr);
+        nonceStr=EncodingUtil.base64Encode(nonceBlob);
+         
+        // Calling the webserivce callout..  
+        DRStubForEclipseEDMS1.DealWebServiceEndpoint  stub = new DRStubForEclipseEDMS1.DealWebServiceEndpoint ();  
+         
+        stub.endpoint_x=Label.EDMS_Tibco_URL;
+        stub.timeout_x=25000;
+        stub.clientCertName_x='SFDC_Certificate';
+        stub.inputHttpHeaders_x = new Map<String, String>();
+        stub.inputHttpHeaders_x.put('Content-Type', 'application/soap+xml');
+        //This action value is from WSDL
+        stub.inputHttpHeaders_x.put('SOAPAction','/BusinessServices/Service/SFDC_Eclipse_service.serviceagent/DealWebServiceEndpoint/CreateNewDealVersionFromXMLRequest');
+       
+        
+        /*DREclipseCreateDealReqClass1.Request_element initialReq=  new DREclipseCreateDealReqClass1.Request_element();
+        initialReq.Version = version;
+        //initialReq.Action = Action;
+        initialReq.dealRequestXml = OpporunityXml;
+        DREclipseCreateDealReqClass1.Requests_element EDMSReq = new DREclipseCreateDealReqClass1.Requests_element();
+        EDMSReq.Request = initialReq;*/
+        
+        DREclipseNewVerServiceClass1.Request_element  ReqNV =  new DREclipseNewVerServiceClass1.Request_element();
+        ReqNV.Version = version;
+        ReqNV.dealRequestxml = OpporunityXml;
+        
+        DREclipseNewVerServiceClass1.Requests_element SReq = new DREclipseNewVerServiceClass1.Requests_element();
+        SReq.Request = new List<DREclipseNewVerServiceClass1.Request_element>();
+        SReq.Request.add(ReqNV);
+        status = stub.CreateNewDealVersionFromXMLRequest(OpportunityId,ApproverEmail,SReq,Label.EDMS_Tibco_UserId,Label.EDMS_Tibco_Password,nonceStr,createdStr);
+        system.debug('status returned by Tibco*****'+status);
+        return status;
+        
+       // status = stub.CreateNewDealVersionFromXMLRequest(OpporunityXml,ApproverEmail,EDMSReq,Label.EDMS_Tibco_UserId,Label.EDMS_Tibco_Password,nonceStr,createdStr);
+                      
+    }
+    public static string callWebServiceCancelDeal(String OpporunityXml,String Approveremail,String Version,Id OpportunityId,String Status){
+        DateTime d = System.now();
+        String createdStr = d.formatGmt('yyyy-MM-dd HH:mm:ss.SSSSSS');
+        String nonceStr = String.valueOf(Crypto.getRandomInteger());                            
+        Blob nonceBlob = Blob.valueOf(nonceStr);
+        nonceStr=EncodingUtil.base64Encode(nonceBlob);
+         
+        // Calling the webserivce callout..  
+        DRStubForEclipseEDMS1.DealWebServiceEndpoint  stub = new DRStubForEclipseEDMS1.DealWebServiceEndpoint();  
+         
+        stub.endpoint_x=Label.EDMS_Tibco_URL;
+        stub.clientCertName_x='SFDC_Certificate';
+        stub.inputHttpHeaders_x = new Map<String, String>();
+        stub.inputHttpHeaders_x.put('Content-Type', 'application/soap+xml');
+                stub.timeout_x=25000;
+
+        //This action value is from WSDL
+        stub.inputHttpHeaders_x.put('SOAPAction','/BusinessServices/Service/SFDC_Eclipse_service.serviceagent/DealWebServiceEndpoint/CancleDelReq');
+         
+        DREclipseCancelDealServiceClass1.Requests_element EDMSCanReq = new DREclipseCancelDealServiceClass1.Requests_element();
+        EDMSCanReq.Request = new List<DREclipseCancelDealServiceClass1.Request_element>();
+
+        DREclipseCancelDealServiceClass1.Request_element ReqObj = new DREclipseCancelDealServiceClass1.Request_element();
+        ReqObj.Version = Version;
+       // ReqObj.Action = Action;
+        ReqObj.dealCancelRequest = OpporunityXml;
+
+        EDMSCanReq.Request.add(ReqObj);
+        status = stub.CancleDelReq(OpportunityId,ApproverEmail,EDMSCanReq,Label.EDMS_Tibco_UserId,Label.EDMS_Tibco_Password,nonceStr,createdStr);
+        system.debug('status returned by Tibco*****'+status);
+        return status;
+    }
+    public static string CreateDeal2FromXMLRequest(String OpporunityXml,String Approveremail,String Version,Id OpportunityId,String Status){
+        DateTime d = System.now();
+        String createdStr = d.formatGmt('yyyy-MM-dd HH:mm:ss.SSSSSS');
+        String nonceStr = String.valueOf(Crypto.getRandomInteger());                            
+        Blob nonceBlob = Blob.valueOf(nonceStr);
+        nonceStr=EncodingUtil.base64Encode(nonceBlob);
+        // Calling the webserivce callout.. 
+        DRStubForEclipseEDMS1.DealWebServiceEndpoint  stub = new DRStubForEclipseEDMS1.DealWebServiceEndpoint();  
+        stub.endpoint_x=Label.EDMS_Tibco_URL;
+        stub.clientCertName_x='SFDC_Certificate';
+        stub.inputHttpHeaders_x = new Map<String, String>();
+        stub.inputHttpHeaders_x.put('Content-Type', 'application/soap+xml');
+                stub.timeout_x=25000;
+
+        //This action value is from WSDL
+        stub.inputHttpHeaders_x.put('SOAPAction','/BusinessServices/Service/SFDC_Eclipse_service.serviceagent/DealWebServiceEndpoint/CreateDeal2FromXMLRequest');
+        DREclipseCreateDealReqClass1.Request_element  ReqElemt = new DREclipseCreateDealReqClass1.Request_element();
+        ReqElemt.Version = Version;
+        //ReqElemt.Action = Action;
+        ReqElemt.dealRequestXml = OpporunityXml;
+        DREclipseCreateDealReqClass1.Requests_element  EDMSReq = new DREclipseCreateDealReqClass1.Requests_element();
+        EDMSReq.Request = ReqElemt;
+        status = stub.CreateDeal2FromXMLRequest(OpportunityId,Approveremail,EDMSReq,Label.EDMS_Tibco_UserId,Label.EDMS_Tibco_Password,nonceStr,createdStr);
+        system.debug('status returned by Tibco*****'+status);
+        return status;
+}
+}
